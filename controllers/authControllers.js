@@ -43,7 +43,17 @@ const singin = async (req, res) => {
   });
 };
 
+const getCurrent = async (req, res) => {
+  const { username, email } = req.user;
+
+  res.json({
+    username,
+    email,
+  });
+};
+
 export default {
   signup: ctrlWrapper(signup),
   signin: ctrlWrapper(singin),
+  getCurrent: ctrlWrapper(getCurrent),
 };

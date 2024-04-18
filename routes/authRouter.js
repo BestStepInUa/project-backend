@@ -7,7 +7,7 @@ const authRouter = express.Router();
 
 authRouter.post('/signup', validateBody(userSingupSchema), authControllers.signup);
 
-authRouter.post('/current', authControllers.current);
+authRouter.post('/current', authControllers.getCurrent);
 
 authRouter.post('/signin', validateBody(userSinginSchema), authControllers.signin);
 
