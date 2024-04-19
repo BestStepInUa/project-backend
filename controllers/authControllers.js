@@ -1,10 +1,12 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import { nanoid } from 'nanoid';
 import * as authServices from '../services/authServices.js';
 import HttpError from '../helpers/HttpError.js';
+import sendMail from '../helpers/sendEmail.js';
 import ctrlWrapper from '../decorators/ctrlWrapper.js';
 
-const { JWT_SECRET } = process.env;
+const { JWT_SECRET, PROJECT_URL } = process.env;
 
 const signup = async (req, res) => {
   const { email, password } = req.body;
@@ -14,7 +16,16 @@ const signup = async (req, res) => {
   }
 
   const hashPassword = await bcrypt.hash(password, 10);
-  const newUser = await authServices.singup({ ...req.body, password: hashPassword });
+  const verificationCode = nanoid();
+  const newUser = await authServices.singup({ ...req.body, password: hashPassword, verificationCode });
+
+  const verifyEmail = {
+    to: email,
+    subject: 'Verify email',
+    html: `<a target='_blank' href='${PROJECT_URL}/api/auth/verify/${verificationCode}'>Verify your email</a>`,
+  };
+
+  await sendMail(verifyEmail);
 
   res.status(201).json({
     username: newUser.username,
