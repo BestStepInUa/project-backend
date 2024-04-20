@@ -5,8 +5,10 @@ import * as authServices from '../services/authServices.js';
 import HttpError from '../helpers/HttpError.js';
 import sendMail from '../helpers/sendEmail.js';
 import ctrlWrapper from '../decorators/ctrlWrapper.js';
+import createVerifyEmail from '../helpers/createVerifyEmail.js';
 
-const { JWT_SECRET, PROJECT_URL } = process.env;
+// const { JWT_SECRET, PROJECT_URL } = process.env;
+const { JWT_SECRET } = process.env;
 
 const signup = async (req, res) => {
   const { email, password } = req.body;
@@ -19,11 +21,12 @@ const signup = async (req, res) => {
   const verificationCode = nanoid();
   const newUser = await authServices.singup({ ...req.body, password: hashPassword, verificationCode });
 
-  const verifyEmail = {
-    to: email,
-    subject: 'Verify email',
-    html: `<a target='_blank' href='${PROJECT_URL}/api/auth/verify/${verificationCode}'>Verify your email</a>`,
-  };
+  const verifyEmail = createVerifyEmail(email, verificationCode);
+  // const verifyEmail = {
+  //   to: email,
+  //   subject: 'Verify email',
+  //   html: `<a target='_blank' href='${PROJECT_URL}/api/auth/verify/${verificationCode}'>Verify your email</a>`,
+  // };
 
   await sendMail(verifyEmail);
 
@@ -57,11 +60,12 @@ const resendVerify = async (req, res) => {
     throw HttpError(400, 'Email already verified');
   }
 
-  const verifyEmail = {
-    to: email,
-    subject: 'Verify email',
-    html: `<a target='_blank' href='${PROJECT_URL}/api/auth/verify/${user.verificationCode}'>Verify your email</a>`,
-  };
+  const verifyEmail = createVerifyEmail(email, user.verificationCode);
+  // const verifyEmail = {
+  //   to: email,
+  //   subject: 'Verify email',
+  //   html: `<a target='_blank' href='${PROJECT_URL}/api/auth/verify/${user.verificationCode}'>Verify your email</a>`,
+  // };
 
   await sendMail(verifyEmail);
 
