@@ -25,7 +25,7 @@ const userSchema = new Schema(
     },
     verificationCode: {
       type: String,
-      required: [true, 'Verify code is required'],
+      // required: [true, 'Verify code is required'],
     },
   },
   {
